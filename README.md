@@ -3,11 +3,16 @@
 
 🇵🇹 Seu reprodutor de música do YouTube que simula perfeitamente o áudio de um toca-discos com efeitos incluindo a oscilação do tom do motor, o chiado, os estalos e os saltos da agulha.
 
+###### ⚠️ Only tested on Linux (Linux Mint). Do not expect it to work on Windows \*, MacOS\* or \*BSD.
+###### ⚠️ Testado apenas no Linux (Linux Mint). Não espere que funcione no Windows \*, MacOS\* ou \*BSD.
+
 # 🇺🇸 How to Install | 🇵🇹 Como Instalar
 1. `git clone https://github.com/SurnameGuy/TurnTable`
 2. `cd TurnTable`
 3. `./build.sh`
+
 🇺🇸 Enjoy!
+
 🇵🇹 Aproveite!
 
 # 🇺🇸 Screenshots | 🇵🇹 Capturas de Tela
