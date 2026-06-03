@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Exemplo pywebview</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        @-webkit-keyframes rotating
+
+        
+            {
+            from {
+                -webkit-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+
+            to {
+                -webkit-transform: rotate(360deg);
+                -o-transform: rotate(360deg);
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes rotating {
+            from {
+                -ms-transform: rotate(0deg);
+                -moz-transform: rotate(0deg);
+                -webkit-transform: rotate(0deg);
+                -o-transform: rotate(0deg);
+                transform: rotate(0deg);
+            }
+
+            to {
+                -ms-transform: rotate(360deg);
+                -moz-transform: rotate(360deg);
+                -webkit-transform: rotate(360deg);
+                -o-transform: rotate(360deg);
+                transform: rotate(360deg);
+            }
+        }
+
+        .rotating {
+            -webkit-animation: rotating 4s linear infinite;
+            -moz-animation: rotating 4s linear infinite;
+            -ms-animation: rotating 4s linear infinite;
+            -o-animation: rotating 4s linear infinite;
+            animation: rotating 4s linear infinite;
+        }
+
+        #diskContainer {
+            display: flex;
+            position: relative;
+            align-items: center;
+            justify-content: center;
+            width: 40%;
+            height: fit-content;
+            cursor: grab;
+        }
+
+        #disk {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            border-radius: 50%;
+        }
+
+        #thumbnailContainer {
+            position: absolute;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            width: 55%;
+            height: 55%;
+            border-radius: 50%;
+        }
+
+        #thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scale(1.1);
+            object-position: center 20%;
+        }
+
+        #diskMiddle {
+            position: absolute;
+            width: 5%;
+            height: 5%;
+            border-radius: 50%;
+            background-color: #303030;
+            border: 0.5px solid #1e1e1e;
+        }
+
+        html,
+        body,
+        #root {
+            height: 100vh;
+        }
+
+        body {
+            background-color: #303030;
+            color: #F6F6F6;
+            overflow: hidden;
+        }
+
+        #root {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #background {
+            display: flex;
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #toolbar {
+            
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 46px;
+            padding: 0 12px;
+            background-color: #3D3D3D;
+            border-bottom: 1px solid #1E1E1E;
+            color: #F6F6F6;
+            gap: 6px;
+            
+
+            
+            position: relative;
+            z-index: 9000;
+        }
+
+        #urlInput {
+            width: 75%;
+        }
+
+        p,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            color: #F7F7F7
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        input[type="number"],
+        textarea {
+            box-sizing: border-box;
+            line-height: 1.5;
+            cursor: text;
+            height: 34px;
+
+            
+            background-color: #2D2D2D;
+            
+            color: #F6F6F6;
+            
+            border: 1px solid #1E1E1E;
+            
+            border-radius: 6px;
+
+            padding: 10px 14px;
+            font-family: system-ui, -apple-system, sans-serif;
+            outline: none;
+
+            
+            transition: box-shadow 0.15s ease, border-color 0.15s ease;
+        }
+
+        
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        input[type="email"]:focus,
+        input[type="number"]:focus,
+        textarea:focus {
+            border-color: #E95420;
+            
+            box-shadow: 0 0 0 2px rgba(233, 84, 32, 0.3);
+            
+        }
+
+        
+        input::placeholder,
+        textarea::placeholder {
+            color: #8D8D8D;
+        }
+
+        button,
+        input[type="submit"],
+        input[type="button"] {
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background-color: #3D3D3D;
+            color: #F6F6F6;
+            border: 1px solid #1E1E1E;
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-weight: 500;
+            transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        button:hover,
+        input[type="submit"]:hover,
+        input[type="button"]:hover {
+            background-color: #E95420;
+            border-color: #DF622A;
+            color: #FFFFFF;
+        }
+
+        button:active,
+        input[type="submit"]:active,
+        input[type="button"]:active {
+            background-color: #C34315;
+        }
+
+        button:focus-visible,
+        input[type="submit"]:focus-visible,
+        input[type="button"]:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(233, 84, 32, 0.4);
+        }
+
+        #toolbar {
+            
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            
+            height: 46px;
+            
+            padding: 0 12px;
+
+            
+            background-color: #3D3D3D;
+            border-bottom: 1px solid #1E1E1E;
+            
+            color: #F6F6F6;
+        }
+
+        
+        #toolbar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            
+        }
+
+        
+        #toolbar button {
+            height: 34px;
+            
+        }
+
+        #urlInputContainer {
+            position: relative;
+            width: 75%;
+        }
+
+        #urlInput {
+            width: 100% !important;
+            
+        }
+
+        
+        #popover {
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.2, 0.9, 0.3, 1), visibility 0s linear 0.15s;
+
+            position: absolute;
+            top: 46px;
+            left: 0;
+            width: 100%;
+            background-color: transparent;
+
+            
+            z-index: 9999;
+            box-sizing: border-box;
+        }
+
+        
+        #popover.show {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.2, 0.9, 0.3, 1), visibility 0s linear 0s;
+        }
+
+        
+        #popover::before {
+            content: '';
+            position: absolute;
+            top: -7.5px;
+            
+            left: 24px;
+            width: 13px;
+            height: 13px;
+            background-color: #2D2D2D;
+            border-top: 1px solid #1E1E1E;
+            border-left: 1px solid #1E1E1E;
+            transform: rotate(45deg);
+            border-radius: 2px 0 0 0;
+
+            
+            z-index: 10;
+        }
+
+        
+        #searchResults {
+            max-height: 260px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background-color: #2D2D2D;
+            border: 1px solid #1E1E1E;
+            border-radius: 10px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 2;
+
+            
+            background-clip: padding-box;
+        }
+
+        
+        #searchResults::-webkit-scrollbar {
+            width: 14px !important;
+        }
+
+        
+        #searchResults::-webkit-scrollbar-button,
+        #searchResults::-webkit-scrollbar-button:start,
+        #searchResults::-webkit-scrollbar-button:end,
+        #searchResults::-webkit-scrollbar-button:vertical:decrement,
+        #searchResults::-webkit-scrollbar-button:vertical:increment {
+            display: none !important;
+            height: 0 !important;
+            width: 0 !important;
+        }
+
+        
+        #searchResults::-webkit-scrollbar-track {
+            background-color: transparent !important;
+            background: transparent !important;
+        }
+
+        
+        #searchResults::-webkit-scrollbar-thumb {
+            background-color: #5A5A5A !important;
+            
+            border-radius: 20px !important;
+            
+            border: 4px solid #2D2D2D !important;
+        }
+
+        
+        #searchResults::-webkit-scrollbar-thumb:hover {
+            background-color: #7A7A7A !important;
+        }
+
+        
+        #searchResults::-webkit-scrollbar-corner {
+            background: transparent !important;
+        }
+
+        
+        .searchItem {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #353535;
+            transition: background-color 0.1s ease;
+        }
+
+        .searchItem img {
+            width: 56px;
+            height: 38px;
+            
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .searchItem:last-child {
+            border-bottom: none;
+        }
+
+        
+        .searchItem:hover {
+            background-color: #3D3D3D;
+        }
+
+        .searchItem:active {
+            background-color: #E95420;
+        }
+
+        .searchItem img {
+            width: 56px;
+            height: 38px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .searchItem span {
+            font-size: 13px;
+            color: #F6F6F6;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+
+        .textContainer {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .videoTitle {
+            font-size: 13px;
+            color: #F6F6F6;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .channelName {
+            font-size: 11px;
+            color: white;
+            opacity: 0.5;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+
+        @media (max-width: 768px) {
+            #popover {
+                width: calc(100vw - 24px);
+                height: 66vh;
+            }
+
+            #popover.show {
+                transform: translateY(0);
+            }
+
+            
+            #searchResults {
+                height: 100% !important;
+                max-height: 100% !important;
+            }
+
+            .searchItem {
+                padding: 12px 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root">
+        <div id="toolbar">
+            <div id="urlInputContainer">
+                <input type="text" id="urlInput" oninput="handleInput(this.value)"
+                    placeholder="Search or type a URL..."></input>
+                <div id="popover" class="">
+                    <div id="searchResults"></div>
+                </div>
+            </div>
+            <button onclick="processURL()">Play</button>
+        </div>
+        <div id="background">
+            <div id="diskContainer" onClick="togglePause()" class="">
+                <img id="disk" src="assets/disk.png"></img>
+                <div id="thumbnailContainer">
+                    <img id="thumbnail" src="">
+                </div>
+                <div id="diskMiddle"></div>
+            </div>
+            <div id="resultado"></div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('pywebviewready', () => {
+            pywebview.api.onDOMContentLoaded().then(function (response) {
+                if (response && response.url) {
+                    processURL(response.url);
+                }
+            }
+            )
+        });
+
+        function togglePause() {
+            pywebview.api.togglePause();
+        }
+
+        function processURL(url) {
+            let inputValue = document.getElementById('urlInput').value;
+            if (url) {
+                inputValue = url
+            }
+            pywebview.api.processURL(inputValue).then(function (response) {
+                document.querySelector('#resultado').innerText = response.message;
+                document.querySelector('#thumbnail').src = response.thumbnail
+                if (response.status == true) {
+                    document.querySelector('#diskContainer').className = 'rotating';
+                    document.querySelector('#diskContainer').style.animationPlayState = 'running';
+                } else {
+                    document.querySelector('#diskContainer').style.animationPlayState = 'paused';
+                }
+            });
+            document.querySelector('#urlInput').value = "";
+        }
+
+        function onMusicPlaying() {
+            document.querySelector('#diskContainer').style.animationPlayState = 'running';
+        }
+
+        function onMusicStop() {
+            document.querySelector('#diskContainer').style.animationPlayState = 'paused';
+        }
+
+        let searchTimeout = null;
+
+        function handleInput(value) {
+            clearTimeout(searchTimeout);
+            const popover = document.querySelector('#popover');
+            const container = document.querySelector('#searchResults');
+
+            if (!value.trim() || value.startsWith('http://') || value.startsWith('https://') || value.includes('youtube.com') || value.includes('youtu.be')) {
+                popover.classList.remove('show');
+                container.innerHTML = '';
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                pywebview.api.searchYouTube(value).then(results => {
+                    container.innerHTML = '';
+
+                                        container.scrollTop = 0;
+
+                    if (results && results.length > 0) {
+                        results.forEach(item => {
+                            const div = document.createElement('div');
+                            div.className = 'searchItem';
+                            const cleanTitle = item.title.replace(/'/g, "&apos;");
+                            div.onclick = () => selectResult(item.url);
+
+                                                        div.innerHTML = `
+                        <img src="${item.thumbnail}" alt="thumb">
+                        <div class="textContainer">
+                            <span class="videoTitle" title="${cleanTitle}">${item.title}</span>
+                            <span class="channelName">${item.channelName || 'Canal Desconhecido'}</span>
+                        </div>
+                    `;
+                            container.appendChild(div);
+                        });
+                        popover.classList.add('show');
+                    } else {
+                        popover.classList.remove('show');
+                    }
+                });
+            }, 500);
+        }
+
+        function selectResult(url) {
+            document.querySelector('#popover').classList.remove('show');
+            processURL(url);
+        }
+
+        document.getElementById('urlInput').addEventListener('focus', function () {
+            const popover = document.querySelector('#popover');
+            const container = document.querySelector('#searchResults');
+
+                        if (this.value.trim() !== '' && container.innerHTML.trim() !== '') {
+                popover.classList.add('show');
+            }
+        });
+
+        document.addEventListener('click', function (event) {
+            const urlInputContainer = document.querySelector('#urlInputContainer');
+            const popover = document.querySelector('#popover');
+            if (!urlInputContainer.contains(event.target)) {
+                document.querySelector('#popover').classList.remove('show');
+            }
+        });
+    </script>
+</body>
+
+</html>
